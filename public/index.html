@@ -181,8 +181,8 @@
         
         table {
             width: 100%;
-            min-width: 700px;
             border-collapse: collapse;
+            table-layout: fixed;
         }
         
         th {
@@ -196,10 +196,10 @@
             letter-spacing: 0.5px;
         }
         
-        th:nth-child(1) { width: 20%; }
-        th:nth-child(2) { width: 18%; }
-        th:nth-child(3) { width: 18%; }
-        th:nth-child(4) { width: 44%; }
+        th:nth-child(1) { width: 16%; }
+        th:nth-child(2) { width: 16%; }
+        th:nth-child(3) { width: 16%; }
+        th:nth-child(4) { width: 52%; }
         
         td {
             padding: 18px 20px;
@@ -302,11 +302,12 @@
                 font-size: 13px;
             }
             th, td {
-                padding: 12px 8px;
+                padding: 12px 6px;
                 white-space: nowrap;
+                font-size: 12px;
             }
             th {
-                font-size: 11px;
+                font-size: 10px;
             }
         }
     </style>
