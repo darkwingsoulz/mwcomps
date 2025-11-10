@@ -399,16 +399,15 @@
             html += '</div>';
             
             html += '<div class="card"><div class="table-wrapper"><table><thead><tr>';
-            html += '<th>Package Entries</th><th>Price</th><th>Win Probability</th><th>Odds</th><th>Expected Cost</th>';
+            html += '<th>Bundles</th><th>Price</th><th>Win Probability</th><th>Odds</th>';
             html += '</tr></thead><tbody>';
             
             packages.forEach(pkg => {
                 html += '<tr>';
                 html += `<td>${pkg.entries.toLocaleString()}</td>`;
-                html += `<td class="price-cell">$${pkg.price.toFixed(2)}</td>`;
+                html += `<td class="price-cell">${pkg.price.toFixed(2)}</td>`;
                 html += `<td class="win-cell">${(pkg.probability * 100).toFixed(4)}%</td>`;
                 html += `<td class="odds-cell">1 in ${pkg.oneIn !== Infinity ? pkg.oneIn.toLocaleString() : '∞'}</td>`;
-                html += `<td class="price-cell">${pkg.costBasedOnOdds !== Infinity ? '$' + pkg.costBasedOnOdds.toFixed(2) : '∞'}</td>`;
                 html += '</tr>';
             });
             
