@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetaWin Competition Odds Calculator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #0a0e27;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+        
+        .logo {
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff 0%, #7b2ff7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+        
+        .subtitle {
+            color: #8b92b0;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #1a1f3a 0%, #151829 100%);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(123, 47, 247, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        
+        .inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #b4b9d0;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input {
+            padding: 14px 16px;
+            background: #0a0e27;
+            border: 1px solid #2a2f4a;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #fff;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #7b2ff7;
+            box-shadow: 0 0 0 3px rgba(123, 47, 247, 0.1);
+        }
+        
+        input::placeholder {
+            color: #4a4f6a;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #7b2ff7 0%, #00d4ff 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 20px rgba(123, 47, 247, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(123, 47, 247, 0.6);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin: 32px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #1e2342 0%, #151829 100%);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #2a2f4a;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #7b2ff7 0%, #00d4ff 100%);
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #8b92b0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff 0%, #7b2ff7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-sub {
+            font-size: 14px;
+            margin-top: 8px;
+            color: #b4b9d0;
+            font-weight: 500;
+        }
+        
+        .table-wrapper {
+            background: linear-gradient(135deg, #1a1f3a 0%, #151829 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #2a2f4a;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #7b2ff7 0%, #5521b5 100%);
+            color: white;
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid #2a2f4a;
+            color: #e0e4f0;
+            font-weight: 500;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background: rgba(123, 47, 247, 0.05);
+        }
+        
+        .price-cell {
+            color: #00d4ff;
+            font-weight: 700;
+        }
+        
+        .odds-cell {
+            color: #7b2ff7;
+            font-weight: 700;
+        }
+        
+        .win-cell {
+            color: #00ff88;
+            font-weight: 700;
+        }
+        
+        .error {
+            background: linear-gradient(135deg, #3d1a1a 0%, #2a1313 100%);
+            color: #ff6b6b;
+            padding: 18px 24px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ff6b6b;
+            font-weight: 500;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 18px;
+            color: #8b92b0;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        #results { display: none; }
+        
+        .glow {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(123, 47, 247, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .glow-1 {
+            top: -250px;
+            left: -250px;
+        }
+        
+        .glow-2 {
+            bottom: -250px;
+            right: -250px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.15) 0%, transparent 70%);
+        }
+        
+        @media (max-width: 768px) {
+            .inputs { 
+                grid-template-columns: 1fr; 
+            }
+            .stat-value { 
+                font-size: 28px; 
+            }
+            .logo {
+                font-size: 32px;
+            }
+            .header {
+                padding: 20px 0;
+            }
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 12px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="logo">METAWIN</div>
+            <div class="subtitle">Competition Odds Calculator</div>
+        </div>
+        
+        <div class="card">
+            <div class="inputs">
+                <div class="input-group">
+                    <label for="compid">Competition ID</label>
+                    <input type="text" id="compid" placeholder="Enter competition ID">
+                </div>
+                <div class="input-group">
+                    <label for="entries">Your Current Entries</label>
+                    <input type="number" id="entries" value="0" min="0" placeholder="0">
+                </div>
+            </div>
+            
+            <button onclick="calculate()" id="calcBtn">Calculate Odds</button>
+            
+            <div id="error"></div>
+            <div id="loading" class="loading" style="display:none;">Calculating your odds</div>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Get URL parameters if provided
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('compid')) {
+            document.getElementById('compid').value = params.get('compid');
+            document.getElementById('entries').value = params.get('entries') || '0';
+            calculate();
+        }
+
+        async function calculate() {
+            const compId = document.getElementById('compid').value.trim();
+            const entries = parseInt(document.getElementById('entries').value) || 0;
+            
+            const errorDiv = document.getElementById('error');
+            const loadingDiv = document.getElementById('loading');
+            const resultsDiv = document.getElementById('results');
+            const calcBtn = document.getElementById('calcBtn');
+            
+            errorDiv.innerHTML = '';
+            resultsDiv.style.display = 'none';
+            
+            if (!compId) {
+                errorDiv.innerHTML = '<div class="error">Please enter a Competition ID</div>';
+                return;
+            }
+            
+            calcBtn.disabled = true;
+            loadingDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch(`/api/calculate?compid=${compId}&entries=${entries}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to fetch data');
+                }
+                
+                displayResults(data);
+                
+            } catch (err) {
+                errorDiv.innerHTML = `<div class="error">Error: ${err.message}</div>`;
+            } finally {
+                calcBtn.disabled = false;
+                loadingDiv.style.display = 'none';
+            }
+        }
+        
+        function displayResults(data) {
+            const { compId, othersEntries, yourEntries, overallEntries, currentOdds, packages } = data;
+            
+            let html = '<div class="stats">';
+            html += `<div class="stat-card"><div class="stat-label">Total Competitors</div><div class="stat-value">${othersEntries.toLocaleString()}</div></div>`;
+            html += `<div class="stat-card"><div class="stat-label">Your Entries</div><div class="stat-value">${yourEntries.toLocaleString()}</div></div>`;
+            html += `<div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value">${overallEntries.toLocaleString()}</div></div>`;
+            
+            if (yourEntries > 0) {
+                const oneInCurrent = Math.max(1, Math.round(1 / Math.max(currentOdds, 1e-12)));
+                html += `<div class="stat-card"><div class="stat-label">Your Current Odds</div><div class="stat-value">${(currentOdds * 100).toFixed(4)}%</div><div class="stat-sub">1 in ${oneInCurrent.toLocaleString()}</div></div>`;
+            }
+            html += '</div>';
+            
+            html += '<div class="card"><div class="table-wrapper"><table><thead><tr>';
+            html += '<th>Package Entries</th><th>Price</th><th>Win Probability</th><th>Odds</th><th>Expected Cost</th>';
+            html += '</tr></thead><tbody>';
+            
+            packages.forEach(pkg => {
+                html += '<tr>';
+                html += `<td>${pkg.entries.toLocaleString()}</td>`;
+                html += `<td class="price-cell">$${pkg.price.toFixed(2)}</td>`;
+                html += `<td class="win-cell">${(pkg.probability * 100).toFixed(4)}%</td>`;
+                html += `<td class="odds-cell">1 in ${pkg.oneIn !== Infinity ? pkg.oneIn.toLocaleString() : '∞'}</td>`;
+                html += `<td class="price-cell">${pkg.costBasedOnOdds !== Infinity ? '$' + pkg.costBasedOnOdds.toFixed(2) : '∞'}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table></div></div>';
+            
+            document.getElementById('results').innerHTML = html;
+            document.getElementById('results').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
