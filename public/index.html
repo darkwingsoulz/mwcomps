@@ -410,22 +410,23 @@
                 html += `<div class="stat-card"><div class="stat-label">Your Current Odds</div><div class="stat-value">${(currentOdds * 100).toFixed(2)}%</div><div class="stat-sub">1 in ${oneInCurrent.toLocaleString()}</div></div>`;
             }
             html += '</div>';
-            
-            html += '<div class="card"><div class="table-wrapper"><table><thead><tr>';
-            html += '<th>Bundles</th><th>Price</th><th>Win %</th><th>Odds</th>';
-            html += '</tr></thead><tbody>';
-            
-            packages.forEach(pkg => {
-                html += '<tr>';
-                html += `<td>${pkg.entries.toLocaleString()}</td>`;
-                html += `<td class="price-cell">$${pkg.price.toFixed(2)}</td>`;
-                html += `<td class="win-cell">${(pkg.probability * 100).toFixed(2)}%</td>`;
-                html += `<td class="odds-cell">1 in ${pkg.oneIn !== Infinity ? pkg.oneIn.toLocaleString() : '∞'}</td>`;
-                html += '</tr>';
-            });
-            
-            html += '</tbody></table></div></div>';
-            
+
+            if (packages && packages.length > 0) {
+                html += '<div class="card"><div class="table-wrapper"><table><thead><tr>';
+                html += '<th>Bundles</th><th>Price</th><th>Win %</th><th>Odds</th>';
+                html += '</tr></thead><tbody>';
+                
+                packages.forEach(pkg => {
+                    html += '<tr>';
+                    html += `<td>${pkg.entries.toLocaleString()}</td>`;
+                    html += `<td class="price-cell">$${pkg.price.toFixed(2)}</td>`;
+                    html += `<td class="win-cell">${(pkg.probability * 100).toFixed(2)}%</td>`;
+                    html += `<td class="odds-cell">1 in ${pkg.oneIn !== Infinity ? pkg.oneIn.toLocaleString() : '∞'}</td>`;
+                    html += '</tr>';
+                });
+                
+                html += '</tbody></table></div></div>';
+            }
             document.getElementById('results').innerHTML = html;
             document.getElementById('results').style.display = 'block';
         }
