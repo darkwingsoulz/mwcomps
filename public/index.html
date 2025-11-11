@@ -418,7 +418,7 @@
             packages.forEach(pkg => {
                 html += '<tr>';
                 html += `<td>${pkg.entries.toLocaleString()}</td>`;
-                html += `<td class="price-cell">${pkg.price.toFixed(2)}</td>`;
+                html += `<td class="price-cell">$${pkg.price.toFixed(2)}</td>`;
                 html += `<td class="win-cell">${(pkg.probability * 100).toFixed(2)}%</td>`;
                 html += `<td class="odds-cell">1 in ${pkg.oneIn !== Infinity ? pkg.oneIn.toLocaleString() : '∞'}</td>`;
                 html += '</tr>';
