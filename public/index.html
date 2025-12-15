@@ -303,6 +303,108 @@
             right: -250px;
             background: radial-gradient(circle, rgba(0, 212, 255, 0.15) 0%, transparent 70%);
         }
+
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+        }
+
+        .footer p {
+            font-size: 12px;
+            color: #4a4f6a;
+            margin: 0;
+        }
+
+        .footer a {
+            color: #7b2ff7;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer a:hover {
+            color: #00d4ff;
+            text-decoration: underline;
+        }
+
+        .donation-section {
+            background: linear-gradient(135deg, #1a1f3a 0%, #151829 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 40px 0 20px 0;
+            border: 1px solid rgba(123, 47, 247, 0.2);
+            text-align: center;
+        }
+
+        .donation-section h3 {
+            color: #00d4ff;
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .donation-section p {
+            color: #8b92b0;
+            margin: 0 0 20px 0;
+            font-size: 14px;
+        }
+
+        .donation-addresses {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .donation-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: #0a0e27;
+            border-radius: 8px;
+            border: 1px solid #2a2f4a;
+        }
+
+        .donation-label {
+            color: #b4b9d0;
+            font-size: 13px;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .donation-address {
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            flex: 1;
+            text-align: left;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #7b2ff7 0%, #00d4ff 100%);
+            border: none;
+            border-radius: 6px;
+            padding: 6px 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 32px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(123, 47, 247, 0.4);
+        }
+
+        .copy-btn.copied {
+            background: #00ff88;
+        }
         
         @media (max-width: 768px) {
             .inputs { 
@@ -372,8 +474,33 @@
             <div id="error"></div>
             <div id="loading" class="loading" style="display:none;">Calculating your odds</div>
         </div>
-        
+
         <div id="results"></div>
+
+        <div class="donation-section">
+            <h3>Find this tool useful?</h3>
+            <p>Consider supporting the developer:</p>
+            <div class="donation-addresses">
+                <div class="donation-item">
+                    <span class="donation-label">ENS:</span>
+                    <span class="donation-address" id="ens-address">dwsoulz.eth</span>
+                    <button class="copy-btn" onclick="copyToClipboard('dwsoulz.eth', this)" title="Copy to clipboard">
+                        📋
+                    </button>
+                </div>
+                <div class="donation-item">
+                    <span class="donation-label">Address:</span>
+                    <span class="donation-address" id="eth-address">0x90fcf38fce6250e9e0187e32c388971aafdd5426</span>
+                    <button class="copy-btn" onclick="copyToClipboard('0x90fcf38fce6250e9e0187e32c388971aafdd5426', this)" title="Copy to clipboard">
+                        📋
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Created by <a href="https://rtp.tools" target="_blank">RTP Tools LLC</a></p>
+        </div>
     </div>
 
     <script>
@@ -426,6 +553,56 @@
             const compId = select.value;
             if (compId) {
                 document.getElementById('compid').value = compId;
+            }
+        }
+
+        async function copyToClipboard(text, button) {
+            try {
+                await navigator.clipboard.writeText(text);
+
+                // Visual feedback
+                const originalText = button.innerHTML;
+                button.innerHTML = '✓';
+                button.classList.add('copied');
+
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    document.execCommand('copy');
+
+                    // Visual feedback
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '✓';
+                    button.classList.add('copied');
+
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.classList.remove('copied');
+                    }, 2000);
+                } catch (err2) {
+                    console.error('Copy failed:', err2);
+                    button.innerHTML = '❌';
+                    setTimeout(() => {
+                        button.innerHTML = '📋';
+                    }, 2000);
+                }
+
+                document.body.removeChild(textArea);
             }
         }
 
