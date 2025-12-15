@@ -9,6 +9,23 @@ const PORT = process.env.PORT || 3000;
 // Serve static files (your HTML page)
 app.use(express.static('public'));
 
+// API endpoint to get recent competitions
+app.get('/api/competitions', async (req, res) => {
+    try {
+        const headers = { 'Origin': 'https://metawin.com' };
+        const url = 'https://api.prod.platform.mwapp.io/sweepstake?includeRecent=30';
+        const response = await axios.get(url, { headers });
+        const competitions = response.data.map(comp => ({
+            id: comp.id,
+            name: comp.name
+        }));
+        res.json(competitions);
+    } catch (err) {
+        console.error('Error fetching competitions:', err.message);
+        res.status(500).json({ error: 'Failed to fetch competitions' });
+    }
+});
+
 // API endpoint that does the calculation
 app.get('/api/calculate', async (req, res) => {
     const { compid, entries = '0' } = req.query;

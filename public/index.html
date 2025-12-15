@@ -92,6 +92,28 @@
         input::placeholder {
             color: #4a4f6a;
         }
+
+        select {
+            padding: 14px 16px;
+            background: #0a0e27;
+            border: 1px solid #2a2f4a;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #fff;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #7b2ff7;
+            box-shadow: 0 0 0 3px rgba(123, 47, 247, 0.1);
+        }
+
+        option {
+            background: #0a0e27;
+            color: #fff;
+        }
         
         button {
             background: linear-gradient(135deg, #7b2ff7 0%, #00d4ff 100%);
@@ -325,12 +347,23 @@
         <div class="card">
             <div class="inputs">
                 <div class="input-group">
-                    <label for="compid">Competition ID</label>
+                    <label for="competition-select">Select Competition (Optional)</label>
+                    <select id="competition-select" onchange="onCompetitionSelect(this)">
+                        <option value="">Loading competitions...</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="compid">Or Enter Competition ID</label>
                     <input type="text" id="compid" placeholder="Enter competition ID" oninput="cleanCompId(this)">
                 </div>
+            </div>
+            <div class="inputs">
                 <div class="input-group">
                     <label for="entries">Your Current Entries</label>
                     <input type="number" id="entries" value="0" min="0" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <!-- Empty for grid layout -->
                 </div>
             </div>
             
@@ -344,12 +377,56 @@
     </div>
 
     <script>
-        // Get URL parameters if provided
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('compid')) {
-            document.getElementById('compid').value = params.get('compid');
-            document.getElementById('entries').value = params.get('entries') || '0';
-            calculate();
+        // Load competitions on page load
+        window.onload = function() {
+            loadCompetitions();
+
+            // Get URL parameters if provided
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('compid')) {
+                document.getElementById('compid').value = params.get('compid');
+                document.getElementById('entries').value = params.get('entries') || '0';
+                calculate();
+            }
+        };
+
+        async function loadCompetitions() {
+            const select = document.getElementById('competition-select');
+
+            try {
+                const response = await fetch('/api/competitions');
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('API Error:', errorData);
+                    select.innerHTML = '<option value="">Failed to load competitions</option>';
+                    return;
+                }
+
+                const competitions = await response.json();
+
+                // Clear loading option
+                select.innerHTML = '<option value="">Choose a competition...</option>';
+
+                // Add competitions to dropdown
+                competitions.forEach(comp => {
+                    const option = document.createElement('option');
+                    option.value = comp.id;
+                    option.textContent = `${comp.id} - ${comp.name}`;
+                    select.appendChild(option);
+                });
+
+            } catch (err) {
+                console.error('Error loading competitions:', err);
+                select.innerHTML = '<option value="">Failed to load competitions</option>';
+            }
+        }
+
+        function onCompetitionSelect(select) {
+            const compId = select.value;
+            if (compId) {
+                document.getElementById('compid').value = compId;
+            }
         }
 
         function cleanCompId(input) {
