@@ -57,10 +57,11 @@ app.get('/api/calculate', async (req, res) => {
             page++;
         }
 
-        // Get entry packages
+        // Get entry packages and competition info
         const pkgUrl = `https://api.prod.platform.mwapp.io/sweepstake/${compid}`;
         const pkgRes = await axios.get(pkgUrl, { headers });
         const pkgData = pkgRes.data;
+        const competitionName = pkgData?.name || '';
         const packages = (pkgData?.entryPackages || [])
             .map(p => ({
                 entries: Number(p.entryCount) || 0,
@@ -90,6 +91,7 @@ app.get('/api/calculate', async (req, res) => {
 
         res.json({
             compId: compid,
+            compName: competitionName,
             othersEntries: total,
             yourEntries: yourEntries,
             overallEntries: overallEntries,

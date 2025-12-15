@@ -496,9 +496,16 @@
         }
         
         function displayResults(data) {
-            const { compId, othersEntries, yourEntries, overallEntries, currentOdds, packages } = data;
-            
-            let html = '<div class="stats">';
+            const { compId, compName, othersEntries, yourEntries, overallEntries, currentOdds, packages } = data;
+
+            let html = '';
+
+            // Competition header
+            if (compName) {
+                html += `<div class="card"><h2 style="color: #00d4ff; margin-bottom: 10px; font-size: 24px;">${compName}</h2><p style="color: #8b92b0; margin: 0;">Competition ID: ${compId}</p></div>`;
+            }
+
+            html += '<div class="stats">';
             html += `<div class="stat-card"><div class="stat-label">Other Entries</div><div class="stat-value">${othersEntries.toLocaleString()}</div></div>`;
             html += `<div class="stat-card"><div class="stat-label">Your Entries</div><div class="stat-value">${yourEntries.toLocaleString()}</div></div>`;
             html += `<div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value">${overallEntries.toLocaleString()}</div></div>`;
