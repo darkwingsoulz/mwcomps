@@ -380,6 +380,9 @@
             font-size: 13px;
             flex: 1;
             text-align: left;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            max-width: 0;
         }
 
         .copy-btn {
@@ -407,11 +410,11 @@
         }
         
         @media (max-width: 768px) {
-            .inputs { 
-                grid-template-columns: 1fr; 
+            .inputs {
+                grid-template-columns: 1fr;
             }
-            .stat-value { 
-                font-size: 28px; 
+            .stat-value {
+                font-size: 28px;
             }
             .logo {
                 font-size: 32px;
@@ -432,6 +435,33 @@
             }
             th {
                 font-size: 10px;
+            }
+            .donation-section {
+                padding: 16px;
+                margin: 30px 0 15px 0;
+            }
+            .donation-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                padding: 12px;
+            }
+            .donation-label {
+                text-align: center;
+                min-width: auto;
+                font-size: 12px;
+            }
+            .donation-address {
+                text-align: center;
+                font-size: 11px;
+                padding: 8px;
+                background: #151829;
+                border-radius: 6px;
+                max-width: none;
+            }
+            .copy-btn {
+                align-self: center;
+                min-width: 60px;
             }
         }
     </style>
