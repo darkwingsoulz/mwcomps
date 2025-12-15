@@ -326,7 +326,7 @@
             <div class="inputs">
                 <div class="input-group">
                     <label for="compid">Competition ID</label>
-                    <input type="text" id="compid" placeholder="Enter competition ID">
+                    <input type="text" id="compid" placeholder="Enter competition ID" oninput="cleanCompId(this)">
                 </div>
                 <div class="input-group">
                     <label for="entries">Your Current Entries</label>
@@ -350,6 +350,27 @@
             document.getElementById('compid').value = params.get('compid');
             document.getElementById('entries').value = params.get('entries') || '0';
             calculate();
+        }
+
+        function cleanCompId(input) {
+            let value = input.value.trim();
+
+            // Extract competition ID from URL if pasted
+            if (value.includes('/')) {
+                // Match patterns like /sweepstake/123456 or metawin.com/sweepstake/123456
+                const match = value.match(/\/sweepstake\/(\d+)/);
+                if (match) {
+                    value = match[1];
+                } else {
+                    // Remove trailing slashes and get the last numeric part
+                    value = value.replace(/\/$/, '').split('/').pop();
+                }
+            }
+
+            // Only keep numbers
+            value = value.replace(/\D/g, '');
+
+            input.value = value;
         }
 
         async function calculate() {
