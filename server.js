@@ -88,14 +88,14 @@ app.get('/api/calculate', async (req, res) => {
 
             // Top prize odds (standard calculation)
             const topPrizeProb = newTotal > 0 ? newYour / newTotal : 0;
-            const topPrizeOneIn = topPrizeProb > 0 ? Math.round(1 / topPrizeProb) : Infinity;
+            const topPrizeOneIn = topPrizeProb > 0 ? parseFloat((1 / topPrizeProb).toFixed(2)) : Infinity;
 
             // Any place odds (for multi-prize competitions)
             // Formula: P(at least one win) = 1 - (1 - m/N)^K
             const anyPlaceProb = isMultiPrize && newTotal > 0
                 ? 1 - Math.pow(1 - newYour / newTotal, prizeCount)
                 : topPrizeProb;
-            const anyPlaceOneIn = anyPlaceProb > 0 ? Math.round(1 / anyPlaceProb) : Infinity;
+            const anyPlaceOneIn = anyPlaceProb > 0 ? parseFloat((1 / anyPlaceProb).toFixed(2)) : Infinity;
 
             const costBasedOnOdds = topPrizeOneIn !== Infinity ? topPrizeOneIn * pkg.price : Infinity;
 
