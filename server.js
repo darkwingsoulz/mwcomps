@@ -62,6 +62,10 @@ app.get('/api/calculate', async (req, res) => {
         const pkgRes = await axios.get(pkgUrl, { headers });
         const pkgData = pkgRes.data;
         const competitionName = pkgData?.name || '';
+        const prizes = pkgData?.prizes || [];
+        const prizeCount = prizes.length;
+        const isMultiPrize = prizeCount > 1;
+
         const packages = (pkgData?.entryPackages || [])
             .map(p => ({
                 entries: Number(p.entryCount) || 0,
@@ -73,19 +77,37 @@ app.get('/api/calculate', async (req, res) => {
         const overallEntries = total + yourEntries;
         const currentOdds = overallEntries > 0 ? yourEntries / overallEntries : 0;
 
+        // Calculate "any place" odds for multi-prize competitions
+        const currentAnyPlaceOdds = isMultiPrize && overallEntries > 0 && yourEntries > 0
+            ? 1 - Math.pow(1 - yourEntries / overallEntries, prizeCount)
+            : currentOdds;
+
         const rows = packages.map(pkg => {
             const newYour = yourEntries + pkg.entries;
             const newTotal = total + yourEntries + pkg.entries;
-            const prob = newTotal > 0 ? newYour / newTotal : 0;
-            const oneIn = prob > 0 ? Math.round(1 / prob) : Infinity;
-            const costBasedOnOdds = oneIn !== Infinity ? oneIn * pkg.price : Infinity;
+
+            // Top prize odds (standard calculation)
+            const topPrizeProb = newTotal > 0 ? newYour / newTotal : 0;
+            const topPrizeOneIn = topPrizeProb > 0 ? Math.round(1 / topPrizeProb) : Infinity;
+
+            // Any place odds (for multi-prize competitions)
+            // Formula: P(at least one win) = 1 - (1 - m/N)^K
+            const anyPlaceProb = isMultiPrize && newTotal > 0
+                ? 1 - Math.pow(1 - newYour / newTotal, prizeCount)
+                : topPrizeProb;
+            const anyPlaceOneIn = anyPlaceProb > 0 ? Math.round(1 / anyPlaceProb) : Infinity;
+
+            const costBasedOnOdds = topPrizeOneIn !== Infinity ? topPrizeOneIn * pkg.price : Infinity;
 
             return {
                 entries: pkg.entries,
                 price: pkg.price,
-                probability: prob,
-                oneIn: oneIn,
-                costBasedOnOdds: costBasedOnOdds
+                probability: topPrizeProb,
+                oneIn: topPrizeOneIn,
+                costBasedOnOdds: costBasedOnOdds,
+                // Additional fields for multi-prize
+                anyPlaceProb: anyPlaceProb,
+                anyPlaceOneIn: anyPlaceOneIn
             };
         });
 
@@ -96,6 +118,9 @@ app.get('/api/calculate', async (req, res) => {
             yourEntries: yourEntries,
             overallEntries: overallEntries,
             currentOdds: currentOdds,
+            currentAnyPlaceOdds: currentAnyPlaceOdds,
+            prizeCount: prizeCount,
+            isMultiPrize: isMultiPrize,
             packages: rows
         });
 

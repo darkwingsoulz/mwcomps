@@ -204,7 +204,8 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed;
+            table-layout: auto;
+            min-width: 600px;
         }
         
         th {
@@ -217,11 +218,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
-        th:nth-child(1) { width: 24%; }
-        th:nth-child(2) { width: 16%; }
-        th:nth-child(3) { width: 16%; }
-        th:nth-child(4) { width: 44%; }
         
         td {
             padding: 18px 20px;
@@ -702,40 +698,81 @@
         }
         
         function displayResults(data) {
-            const { compId, compName, othersEntries, yourEntries, overallEntries, currentOdds, packages } = data;
+            const { compId, compName, othersEntries, yourEntries, overallEntries, currentOdds, currentAnyPlaceOdds, prizeCount, isMultiPrize, packages } = data;
 
             let html = '';
 
             // Competition header
             if (compName) {
-                html += `<div class="card"><h2 style="color: #00d4ff; margin-bottom: 10px; font-size: 24px;">${compName}</h2><p style="color: #8b92b0; margin: 0;">Competition ID: ${compId}</p></div>`;
+                html += `<div class="card"><h2 style="color: #00d4ff; margin-bottom: 10px; font-size: 24px;">${compName}</h2><p style="color: #8b92b0; margin: 0;">Competition ID: ${compId}</p>`;
+
+                if (isMultiPrize) {
+                    html += `<p style="color: #00ff88; margin-top: 10px; font-weight: 600; font-size: 14px;">🏆 Multi-Prize Competition (Top ${prizeCount})</p>`;
+                    html += `<p style="color: #8b92b0; font-size: 13px; margin-top: 8px;">Odds shown below are for winning ANY prize. You can only win one prize - if you win, your entries are removed for subsequent draws.</p>`;
+                }
+
+                html += `</div>`;
             }
 
             html += '<div class="stats">';
             html += `<div class="stat-card"><div class="stat-label">Other Entries</div><div class="stat-value">${othersEntries.toLocaleString()}</div></div>`;
             html += `<div class="stat-card"><div class="stat-label">Your Entries</div><div class="stat-value">${yourEntries.toLocaleString()}</div></div>`;
             html += `<div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value">${overallEntries.toLocaleString()}</div></div>`;
-            
+
             if (yourEntries > 0) {
-                const oneInCurrent = Math.max(1, Math.round(1 / Math.max(currentOdds, 1e-12)));
-                html += `<div class="stat-card"><div class="stat-label">Your Current Odds</div><div class="stat-value">${(currentOdds * 100).toFixed(2)}%</div><div class="stat-sub">1 in ${oneInCurrent.toLocaleString()}</div></div>`;
+                if (isMultiPrize) {
+                    // Show "any place" odds for multi-prize competitions
+                    const oneInAnyPlace = Math.max(1, Math.round(1 / Math.max(currentAnyPlaceOdds, 1e-12)));
+                    html += `<div class="stat-card"><div class="stat-label">Any Place Odds (Top ${prizeCount})</div><div class="stat-value">${(currentAnyPlaceOdds * 100).toFixed(2)}%</div><div class="stat-sub">1 in ${oneInAnyPlace.toLocaleString()}</div></div>`;
+
+                    // Also show top prize odds
+                    const oneInTopPrize = Math.max(1, Math.round(1 / Math.max(currentOdds, 1e-12)));
+                    html += `<div class="stat-card"><div class="stat-label">Top Prize Only</div><div class="stat-value">${(currentOdds * 100).toFixed(2)}%</div><div class="stat-sub">1 in ${oneInTopPrize.toLocaleString()}</div></div>`;
+                } else {
+                    // Show standard odds for single-prize competitions
+                    const oneInCurrent = Math.max(1, Math.round(1 / Math.max(currentOdds, 1e-12)));
+                    html += `<div class="stat-card"><div class="stat-label">Your Current Odds</div><div class="stat-value">${(currentOdds * 100).toFixed(2)}%</div><div class="stat-sub">1 in ${oneInCurrent.toLocaleString()}</div></div>`;
+                }
             }
             html += '</div>';
 
             if (packages && packages.length > 0) {
                 html += '<div class="card"><div class="table-wrapper"><table><thead><tr>';
-                html += '<th>Bundles</th><th>Price</th><th>Win %</th><th>Odds</th>';
+                html += '<th>Bundles</th><th>Price</th>';
+
+                if (isMultiPrize) {
+                    // Show both "Any Place" and "Top Prize" columns for multi-prize competitions
+                    html += '<th>Any Place %</th><th>Any Place Odds</th>';
+                    html += '<th>Top Prize %</th><th>Top Prize Odds</th>';
+                } else {
+                    // Standard columns for single-prize competitions
+                    html += '<th>Win %</th><th>Odds</th>';
+                }
+
                 html += '</tr></thead><tbody>';
-                
+
                 packages.forEach(pkg => {
                     html += '<tr>';
                     html += `<td>${pkg.entries.toLocaleString()}</td>`;
                     html += `<td class="price-cell">$${pkg.price.toFixed(2)}</td>`;
-                    html += `<td class="win-cell">${(pkg.probability * 100).toFixed(2)}%</td>`;
-                    html += `<td class="odds-cell">1 in ${pkg.oneIn !== Infinity ? pkg.oneIn.toLocaleString() : '∞'}</td>`;
+
+                    if (isMultiPrize) {
+                        // Show "any place" odds
+                        html += `<td class="win-cell">${(pkg.anyPlaceProb * 100).toFixed(2)}%</td>`;
+                        html += `<td class="odds-cell">1 in ${pkg.anyPlaceOneIn !== Infinity ? pkg.anyPlaceOneIn.toLocaleString() : '∞'}</td>`;
+
+                        // Show "top prize" odds
+                        html += `<td class="win-cell" style="opacity: 0.7;">${(pkg.probability * 100).toFixed(2)}%</td>`;
+                        html += `<td class="odds-cell" style="opacity: 0.7;">1 in ${pkg.oneIn !== Infinity ? pkg.oneIn.toLocaleString() : '∞'}</td>`;
+                    } else {
+                        // Standard display for single-prize competitions
+                        html += `<td class="win-cell">${(pkg.probability * 100).toFixed(2)}%</td>`;
+                        html += `<td class="odds-cell">1 in ${pkg.oneIn !== Infinity ? pkg.oneIn.toLocaleString() : '∞'}</td>`;
+                    }
+
                     html += '</tr>';
                 });
-                
+
                 html += '</tbody></table></div></div>';
             }
             document.getElementById('results').innerHTML = html;
